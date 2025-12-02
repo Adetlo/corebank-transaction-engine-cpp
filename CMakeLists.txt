@@ -28,3 +28,17 @@ if(TARGET SQLite3::SQLite3)
 else()
   set(COREBANK_SQLITE_TARGET SQLite::SQLite3)
 endif()
+
+# ---------------------------------------------------------------------------
+# Core library: domain
+# ---------------------------------------------------------------------------
+add_library(corebank_core STATIC
+  src/domain/error.cpp
+)
+add_library(corebank::core ALIAS corebank_core)
+target_include_directories(corebank_core PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(corebank_core PUBLIC ${COREBANK_SQLITE_TARGET} Threads::Threads)
+target_compile_definitions(corebank_core PUBLIC COREBANK_VERSION="${PROJECT_VERSION}")
+corebank_set_warnings(corebank_core)
+corebank_platform_flags(corebank_core)
