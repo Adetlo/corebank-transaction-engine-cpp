@@ -1,0 +1,25 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+ColumnLimit: 100
+IndentWidth: 2
+AccessModifierOffset: -1
+DerivePointerAlignment: false
+PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"corebank/'
+    Priority: 1
+  - Regex: '^<(gtest|gmock)/'
+    Priority: 2
+  - Regex: '^<sqlite3\.h>'
+    Priority: 3
+  - Regex: '^<.*\.h>'
+    Priority: 4
+  - Regex: '^<.*'
+    Priority: 5
+SortIncludes: CaseSensitive
+...
