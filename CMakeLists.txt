@@ -36,6 +36,7 @@ add_library(corebank_core STATIC
   src/domain/error.cpp
   src/domain/currency.cpp
   src/domain/money.cpp
+  src/domain/identifiers.cpp
   src/domain/time.cpp
 )
 add_library(corebank::core ALIAS corebank_core)
