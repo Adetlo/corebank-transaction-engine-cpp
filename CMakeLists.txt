@@ -38,6 +38,7 @@ add_library(corebank_core STATIC
   src/domain/money.cpp
   src/domain/identifiers.cpp
   src/domain/time.cpp
+  src/domain/transaction.cpp
 )
 add_library(corebank::core ALIAS corebank_core)
 target_include_directories(corebank_core PUBLIC
