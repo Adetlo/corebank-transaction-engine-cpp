@@ -41,6 +41,7 @@ add_library(corebank_core STATIC
   src/domain/account.cpp
   src/domain/transaction.cpp
   src/domain/posting.cpp
+  src/domain/audit.cpp
 )
 add_library(corebank::core ALIAS corebank_core)
 target_include_directories(corebank_core PUBLIC
