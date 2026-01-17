@@ -30,7 +30,7 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# Core library: domain
+# Core library: domain + infrastructure
 # ---------------------------------------------------------------------------
 add_library(corebank_core STATIC
   src/domain/error.cpp
@@ -42,6 +42,8 @@ add_library(corebank_core STATIC
   src/domain/transaction.cpp
   src/domain/posting.cpp
   src/domain/audit.cpp
+  src/infrastructure/sqlite/connection.cpp
+  src/infrastructure/sqlite/statement.cpp
 )
 add_library(corebank::core ALIAS corebank_core)
 target_include_directories(corebank_core PUBLIC
