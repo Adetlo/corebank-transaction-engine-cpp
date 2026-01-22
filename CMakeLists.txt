@@ -45,6 +45,7 @@ add_library(corebank_core STATIC
   src/infrastructure/sqlite/connection.cpp
   src/infrastructure/sqlite/statement.cpp
   src/infrastructure/sqlite/schema.cpp
+  src/infrastructure/sqlite/sqlite_repository.cpp
 )
 add_library(corebank::core ALIAS corebank_core)
 target_include_directories(corebank_core PUBLIC
