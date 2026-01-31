@@ -30,7 +30,7 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# Core library: domain + infrastructure
+# Core library: domain + application + infrastructure
 # ---------------------------------------------------------------------------
 add_library(corebank_core STATIC
   src/domain/error.cpp
@@ -42,6 +42,8 @@ add_library(corebank_core STATIC
   src/domain/transaction.cpp
   src/domain/posting.cpp
   src/domain/audit.cpp
+  src/application/id_generator.cpp
+  src/application/transaction_service.cpp
   src/infrastructure/sqlite/connection.cpp
   src/infrastructure/sqlite/statement.cpp
   src/infrastructure/sqlite/schema.cpp
