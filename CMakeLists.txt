@@ -44,6 +44,8 @@ add_library(corebank_core STATIC
   src/domain/audit.cpp
   src/application/id_generator.cpp
   src/application/transaction_service.cpp
+  src/infrastructure/logger.cpp
+  src/infrastructure/json_writer.cpp
   src/infrastructure/sqlite/connection.cpp
   src/infrastructure/sqlite/statement.cpp
   src/infrastructure/sqlite/schema.cpp
