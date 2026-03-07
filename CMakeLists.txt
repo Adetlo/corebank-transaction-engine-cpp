@@ -43,6 +43,7 @@ add_library(corebank_core STATIC
   src/domain/posting.cpp
   src/domain/audit.cpp
   src/application/id_generator.cpp
+  src/application/idempotency_gate.cpp
   src/application/transaction_service.cpp
   src/infrastructure/config.cpp
   src/infrastructure/logger.cpp
