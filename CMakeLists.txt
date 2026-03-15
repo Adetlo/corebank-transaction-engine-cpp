@@ -46,6 +46,7 @@ add_library(corebank_core STATIC
   src/application/account_lock_manager.cpp
   src/application/idempotency_gate.cpp
   src/application/transaction_service.cpp
+  src/application/transaction_processor.cpp
   src/infrastructure/config.cpp
   src/infrastructure/logger.cpp
   src/infrastructure/json_writer.cpp
