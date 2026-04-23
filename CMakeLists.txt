@@ -57,6 +57,7 @@ add_library(corebank_core STATIC
   src/infrastructure/sqlite/schema.cpp
   src/infrastructure/sqlite/sqlite_repository.cpp
   src/messaging/protocol.cpp
+  src/messaging/message_handler.cpp
 )
 add_library(corebank::core ALIAS corebank_core)
 target_include_directories(corebank_core PUBLIC
