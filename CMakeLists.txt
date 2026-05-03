@@ -69,3 +69,14 @@ target_link_libraries(corebank_core PUBLIC ${COREBANK_SQLITE_TARGET} Threads::Th
 target_compile_definitions(corebank_core PUBLIC COREBANK_VERSION="${PROJECT_VERSION}")
 corebank_set_warnings(corebank_core)
 corebank_platform_flags(corebank_core)
+
+# ---------------------------------------------------------------------------
+# CLI library
+# ---------------------------------------------------------------------------
+add_library(corebank_cli STATIC
+  src/cli/args.cpp
+  src/cli/output.cpp
+)
+add_library(corebank::cli ALIAS corebank_cli)
+target_link_libraries(corebank_cli PUBLIC corebank::core)
+corebank_set_warnings(corebank_cli)
