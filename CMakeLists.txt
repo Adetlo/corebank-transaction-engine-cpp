@@ -71,12 +71,28 @@ corebank_set_warnings(corebank_core)
 corebank_platform_flags(corebank_core)
 
 # ---------------------------------------------------------------------------
-# CLI library
+# CLI executable
 # ---------------------------------------------------------------------------
 add_library(corebank_cli STATIC
   src/cli/args.cpp
   src/cli/output.cpp
+  src/cli/app.cpp
+  src/cli/commands_account.cpp
+  src/cli/commands_transaction.cpp
+  src/cli/commands_ops.cpp
+  src/cli/commands_serve.cpp
 )
 add_library(corebank::cli ALIAS corebank_cli)
 target_link_libraries(corebank_cli PUBLIC corebank::core)
 corebank_set_warnings(corebank_cli)
+
+add_executable(corebank src/cli/main.cpp)
+target_link_libraries(corebank PRIVATE corebank::cli)
+corebank_set_warnings(corebank)
+
+# ---------------------------------------------------------------------------
+# Install
+# ---------------------------------------------------------------------------
+include(GNUInstallDirs)
+install(TARGETS corebank RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES config/default.yaml DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/corebank)
