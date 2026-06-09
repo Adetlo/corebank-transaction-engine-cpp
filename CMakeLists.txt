@@ -42,6 +42,7 @@ add_library(corebank_core STATIC
   src/domain/transaction.cpp
   src/domain/posting.cpp
   src/domain/audit.cpp
+  src/domain/batch.cpp
   src/domain/reconciliation.cpp
   src/application/id_generator.cpp
   src/application/account_lock_manager.cpp
