@@ -30,7 +30,7 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# Core library: domain + application + infrastructure + messaging
+# Core library: domain + application + infrastructure + messaging + batch
 # ---------------------------------------------------------------------------
 add_library(corebank_core STATIC
   src/domain/error.cpp
@@ -50,6 +50,7 @@ add_library(corebank_core STATIC
   src/application/transaction_service.cpp
   src/application/reconciliation_service.cpp
   src/application/transaction_processor.cpp
+  src/batch/eod_service.cpp
   src/infrastructure/config.cpp
   src/infrastructure/logger.cpp
   src/infrastructure/json_writer.cpp
