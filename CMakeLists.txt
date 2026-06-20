@@ -54,6 +54,7 @@ add_library(corebank_core STATIC
   src/infrastructure/config.cpp
   src/infrastructure/logger.cpp
   src/infrastructure/json_writer.cpp
+  src/infrastructure/signal_handler.cpp
   src/infrastructure/errno_text.cpp
   src/infrastructure/sqlite/connection.cpp
   src/infrastructure/sqlite/statement.cpp
