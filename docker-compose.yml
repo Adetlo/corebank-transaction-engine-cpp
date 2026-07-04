@@ -1,0 +1,33 @@
+# `docker compose up` starts the engine; `docker compose run --rm demo` runs the full
+# synthetic demo against the same database volume. Loopback-only on the host.
+services:
+  engine:
+    build: .
+    image: corebank-transaction-engine:local
+    container_name: corebank-engine
+    ports:
+      - "127.0.0.1:7400:7400"
+    environment:
+      COREBANK_LOG_LEVEL: INFO
+      COREBANK_WORKERS: "4"
+    volumes:
+      - corebank-var:/srv/corebank/var
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  demo:
+    image: corebank-transaction-engine:local
+    profiles: ["demo"]
+    depends_on:
+      engine:
+        condition: service_healthy
+    environment:
+      COREBANK_HOST: engine
+      COREBANK_PORT: "7400"
+      COREBANK_LOG_LEVEL: WARN
+    volumes:
+      - corebank-var:/srv/corebank/var
+    entrypoint: ["/bin/bash", "/srv/corebank/scripts/demo.sh", "--skip-build", "--remote"]
+
+volumes:
+  corebank-var:

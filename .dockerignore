@@ -1,0 +1,12 @@
+build/
+build-*/
+var/
+.demo/
+.git/
+.github/
+docs/
+tests/
+examples/
+*.md
+bench-results*.json
+.cache/
