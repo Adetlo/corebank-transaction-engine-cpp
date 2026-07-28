@@ -15,6 +15,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+option(COREBANK_BUILD_TESTS "Build the test suite" ON)
 option(COREBANK_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -92,6 +93,14 @@ corebank_set_warnings(corebank_cli)
 add_executable(corebank src/cli/main.cpp)
 target_link_libraries(corebank PRIVATE corebank::cli)
 corebank_set_warnings(corebank)
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+if(COREBANK_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
 
 # ---------------------------------------------------------------------------
 # Install
