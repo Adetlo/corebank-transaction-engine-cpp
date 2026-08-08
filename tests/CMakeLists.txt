@@ -48,3 +48,9 @@ corebank_add_test(audit_test integration integration/audit_test.cpp)
 corebank_add_test(reconciliation_test integration integration/reconciliation_test.cpp)
 corebank_add_test(persistence_test integration integration/persistence_test.cpp)
 corebank_add_test(rollback_test integration integration/rollback_test.cpp)
+
+# Concurrency
+corebank_add_test(concurrent_transfers_test concurrency concurrency/concurrent_transfers_test.cpp)
+corebank_add_test(concurrent_idempotency_test concurrency concurrency/concurrent_idempotency_test.cpp)
+corebank_add_test(processor_test concurrency concurrency/processor_test.cpp)
+corebank_add_test(deadlock_test concurrency concurrency/deadlock_test.cpp)
