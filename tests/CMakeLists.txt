@@ -62,3 +62,11 @@ corebank_add_test(eod_test batch batch/eod_test.cpp)
 corebank_add_test(message_handler_test messaging messaging/message_handler_test.cpp)
 corebank_add_test(tcp_server_test messaging messaging/tcp_server_test.cpp)
 corebank_add_test(signal_test messaging messaging/signal_test.cpp)
+
+# Property-style (deterministic randomised invariants)
+corebank_add_test(invariants_test property property/invariants_test.cpp)
+
+# CLI (drives the real binary)
+corebank_add_test(cli_test cli cli/cli_test.cpp)
+target_compile_definitions(cli_test PRIVATE COREBANK_CLI_PATH="$<TARGET_FILE:corebank>")
+add_dependencies(cli_test corebank)
