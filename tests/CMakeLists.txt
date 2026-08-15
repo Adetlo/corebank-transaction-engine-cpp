@@ -54,3 +54,11 @@ corebank_add_test(concurrent_transfers_test concurrency concurrency/concurrent_t
 corebank_add_test(concurrent_idempotency_test concurrency concurrency/concurrent_idempotency_test.cpp)
 corebank_add_test(processor_test concurrency concurrency/processor_test.cpp)
 corebank_add_test(deadlock_test concurrency concurrency/deadlock_test.cpp)
+
+# Batch / EOD
+corebank_add_test(eod_test batch batch/eod_test.cpp)
+
+# Messaging
+corebank_add_test(message_handler_test messaging messaging/message_handler_test.cpp)
+corebank_add_test(tcp_server_test messaging messaging/tcp_server_test.cpp)
+corebank_add_test(signal_test messaging messaging/signal_test.cpp)
