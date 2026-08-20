@@ -17,9 +17,14 @@ endif()
 
 option(COREBANK_BUILD_TESTS "Build the test suite" ON)
 option(COREBANK_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
+option(COREBANK_ENABLE_ASAN "Enable AddressSanitizer" OFF)
+option(COREBANK_ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
+option(COREBANK_ENABLE_TSAN "Enable ThreadSanitizer" OFF)
+option(COREBANK_ENABLE_COVERAGE "Enable gcov/lcov coverage instrumentation" OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CompilerWarnings)
+include(Sanitizers)
 
 find_package(SQLite3 REQUIRED)
 find_package(Threads REQUIRED)
@@ -73,6 +78,7 @@ target_link_libraries(corebank_core PUBLIC ${COREBANK_SQLITE_TARGET} Threads::Th
 target_compile_definitions(corebank_core PUBLIC COREBANK_VERSION="${PROJECT_VERSION}")
 corebank_set_warnings(corebank_core)
 corebank_platform_flags(corebank_core)
+corebank_enable_sanitizers(corebank_core)
 
 # ---------------------------------------------------------------------------
 # CLI executable
@@ -89,10 +95,12 @@ add_library(corebank_cli STATIC
 add_library(corebank::cli ALIAS corebank_cli)
 target_link_libraries(corebank_cli PUBLIC corebank::core)
 corebank_set_warnings(corebank_cli)
+corebank_enable_sanitizers(corebank_cli)
 
 add_executable(corebank src/cli/main.cpp)
 target_link_libraries(corebank PRIVATE corebank::cli)
 corebank_set_warnings(corebank)
+corebank_enable_sanitizers(corebank)
 
 # ---------------------------------------------------------------------------
 # Tests
