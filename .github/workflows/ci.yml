@@ -64,3 +64,80 @@ jobs:
       - name: Check formatting
         run: |
           find src include tests -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
+
+  sanitizers:
+    name: ASan + UBSan
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+      ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1:detect_stack_use_after_return=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev sqlite3
+      - name: Configure with AddressSanitizer and UndefinedBehaviorSanitizer
+        run: cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug -DCOREBANK_ENABLE_ASAN=ON -DCOREBANK_ENABLE_UBSAN=ON
+      - name: Build
+        run: cmake --build build-asan --parallel
+      - name: Test (no sanitizer findings allowed)
+        run: ctest --test-dir build-asan --output-on-failure -j 2
+
+  # ThreadSanitizer runs with clang: GCC's TSan runtime has failed to map its shadow
+  # memory on recent Linux kernels with larger ASLR ranges, while clang 18 handles it.
+  # It covers every suite that spawns threads or sockets plus the unit tests.
+  thread-sanitizer:
+    name: ThreadSanitizer (unit, integration, concurrency, messaging, property)
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+      TSAN_OPTIONS: halt_on_error=1:second_deadlock_stack=1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev
+      - name: Configure with ThreadSanitizer
+        run: cmake -S . -B build-tsan -DCMAKE_BUILD_TYPE=Debug -DCOREBANK_ENABLE_TSAN=ON
+      - name: Build
+        run: cmake --build build-tsan --parallel
+      - name: Test concurrency-sensitive suites under TSan
+        run: ctest --test-dir build-tsan --output-on-failure -L '^(unit|concurrency|messaging|property|integration)$'
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: corebank-transaction-engine:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test the image
+        run: |
+          set -euo pipefail
+          docker run -d --name corebank-ci -p 127.0.0.1:7400:7400 corebank-transaction-engine:ci
+          for i in $(seq 1 30); do
+            if docker exec corebank-ci corebank health --host 127.0.0.1 --port 7400; then break; fi
+            sleep 1
+          done
+          docker exec corebank-ci corebank health --host 127.0.0.1 --port 7400
+          docker exec corebank-ci corebank account create --id CI-A --name "CI A" --currency GBP
+          docker exec corebank-ci corebank send --host 127.0.0.1 --port 7400 "CREDIT|key=CI-1|account=CI-A|amount=10.00|ccy=GBP"
+          docker exec corebank-ci corebank send --host 127.0.0.1 --port 7400 "BALANCE|account=CI-A" | grep -q "balance=10.00"
+          test "$(docker inspect -f '{{.Config.User}}' corebank-ci)" = "corebank:corebank"
+          docker stop -t 30 corebank-ci
+          docker logs corebank-ci > engine.log 2>&1
+          grep '"event":"engine.stopped"' engine.log
+          docker rm corebank-ci
