@@ -65,6 +65,54 @@ jobs:
         run: |
           find src include tests -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
 
+  clang-tidy:
+    name: clang-tidy
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev
+          pipx install clang-tidy==18.1.8
+      - name: Configure (compile_commands.json)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCOREBANK_BUILD_TESTS=OFF
+      - name: Run clang-tidy (warnings are errors, see .clang-tidy)
+        run: |
+          find src -name '*.cpp' | xargs -P "$(nproc)" -I{} clang-tidy -p build --quiet {}
+
+  cppcheck:
+    name: cppcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cppcheck
+          cppcheck --version
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=warning,style,performance,portability --std=c++20 --language=c++ \
+            --inline-suppr --suppressions-list=.cppcheck-suppressions --error-exitcode=1 \
+            --quiet -I include src include
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends shellcheck
+          shellcheck --version
+      - name: Lint scripts
+        run: shellcheck -x -S style scripts/*.sh scripts/lib/common.sh
+
   sanitizers:
     name: ASan + UBSan
     runs-on: ubuntu-latest
