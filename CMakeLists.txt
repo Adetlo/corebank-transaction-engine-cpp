@@ -16,6 +16,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 option(COREBANK_BUILD_TESTS "Build the test suite" ON)
+option(COREBANK_BUILD_BENCH "Build the benchmark executable" ON)
 option(COREBANK_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 option(COREBANK_ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(COREBANK_ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
@@ -103,6 +104,16 @@ corebank_set_warnings(corebank)
 corebank_enable_sanitizers(corebank)
 
 # ---------------------------------------------------------------------------
+# Benchmark executable
+# ---------------------------------------------------------------------------
+if(COREBANK_BUILD_BENCH)
+  add_executable(corebank-bench src/bench/main.cpp)
+  target_link_libraries(corebank-bench PRIVATE corebank::core)
+  corebank_set_warnings(corebank-bench)
+  corebank_enable_sanitizers(corebank-bench)
+endif()
+
+# ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
 if(COREBANK_BUILD_TESTS)
@@ -115,4 +126,7 @@ endif()
 # ---------------------------------------------------------------------------
 include(GNUInstallDirs)
 install(TARGETS corebank RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+if(COREBANK_BUILD_BENCH)
+  install(TARGETS corebank-bench RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
 install(FILES config/default.yaml DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/corebank)
