@@ -53,6 +53,9 @@ jobs:
         run: ctest --test-dir build --output-on-failure -L '^concurrency$'
       - name: Shell smoke test
         run: scripts/smoke_test.sh
+      - name: Benchmark (smoke run, local synthetic numbers only)
+        if: matrix.build_type == 'Release'
+        run: ./build/corebank-bench --transactions 500 --threads 2
 
   format:
     name: clang-format
