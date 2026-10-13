@@ -1,0 +1,21 @@
+name: Documentation
+description: Something in the README, docs/ or ADRs is wrong, unclear or missing.
+labels: [documentation]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Where
+      placeholder: "docs/CONCURRENCY.md, section 'Lock ordering'"
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested wording (optional)
