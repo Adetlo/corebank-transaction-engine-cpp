@@ -1,0 +1,13 @@
+# cppcheck suppressions. Each entry is deliberate; see docs/TESTING.md.
+# cppcheck cannot see the system headers; the message is noise, not a finding.
+missingIncludeSystem
+# Result<T> converts implicitly from T and from Error on purpose: `return value;` and
+# `return error;` are the whole ergonomic point of the type (see ADR-0007).
+noExplicitConstructor
+# Google-style accessors share a name with the parameter/member they expose
+# (`level(LogLevel level)`, `run(BatchRun& run)`); this is idiomatic, not shadowing.
+shadowFunction
+# Interface implementations keep non-static members for symmetry with the base class.
+functionStatic
+# Readability preference: short explicit loops over std::transform with lambdas.
+useStlAlgorithm

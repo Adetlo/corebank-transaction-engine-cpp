@@ -1,0 +1,54 @@
+---
+# Static analysis configuration. Every enabled finding is an error in CI.
+# Rationale for disabled checks is documented in docs/TESTING.md.
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  -bugprone-unchecked-optional-access,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-init-variables,
+  cppcoreguidelines-no-malloc,
+  cppcoreguidelines-owning-memory,
+  cppcoreguidelines-pro-type-cstyle-cast,
+  cppcoreguidelines-slicing,
+  cppcoreguidelines-special-member-functions,
+  cppcoreguidelines-virtual-class-destructor,
+  misc-*,
+  -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner,
+  -misc-no-recursion,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  performance-*,
+  -performance-avoid-endl,
+  -performance-enum-size,
+  portability-*,
+  readability-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-function-cognitive-complexity,
+  -readability-named-parameter,
+  -readability-convert-member-functions-to-static,
+  -readability-else-after-return,
+  -readability-avoid-nested-conditional-operator
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*/(include/corebank|src)/.*'
+FormatStyle: file
+CheckOptions:
+  - key: readability-implicit-bool-conversion.AllowPointerConditions
+    value: true
+  - key: readability-implicit-bool-conversion.AllowIntegerConditions
+    value: false
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: misc-const-correctness.AnalyzeValues
+    value: false
+  - key: performance-unnecessary-value-param.AllowedTypes
+    value: 'std::shared_ptr;std::function'
+  - key: readability-uppercase-literal-suffix.NewSuffixes
+    value: 'L;LL;LU;LLU;U'
+...

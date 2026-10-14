@@ -1,0 +1,26 @@
+# Build output
+build/
+build-*/
+cmake-build-*/
+compile_commands.json
+
+# Runtime state (databases, logs, batch output, pid files)
+var/
+*.db
+*.db-wal
+*.db-shm
+*.log
+*.pid
+
+# Demo and benchmark output
+.demo/
+bench-results*.json
+
+# Tooling caches
+.cache/
+.cppcheck-build/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
