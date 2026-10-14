@@ -1,0 +1,30 @@
+# CoreBank Transaction Engine configuration.
+#
+# Flat `key: value` YAML only (no nesting). Every key can be overridden by an
+# environment variable (COREBANK_*), see docs/OPERATIONS.md. Values here are safe
+# defaults for local use: loopback listener, modest worker pool, bounded queue.
+
+# Persistence (SQLite, WAL mode). Relative paths resolve against the working directory.
+database_path: var/corebank.db
+
+# Worker threads in the transaction processor and the bounded request queue size.
+worker_count: 4
+queue_size: 1024
+
+# Structured JSON-lines logging. log_file empty means stderr.
+log_level: INFO
+log_file: ""
+
+# Where end-of-day output (daily summary, transaction archive) is written.
+batch_dir: var/batch
+
+# Largest single transaction in minor units (100000000000 = 1,000,000,000.00 at 2dp).
+max_transaction_minor: 100000000000
+
+# TCP listener. Keep it on loopback unless a trusted network and a gateway exist.
+listen_address: 127.0.0.1
+listen_port: 7400
+max_connections: 64
+idle_timeout_seconds: 30
+max_message_bytes: 4096
+request_timeout_ms: 5000

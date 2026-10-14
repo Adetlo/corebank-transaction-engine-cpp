@@ -1,0 +1,14 @@
+# Example wire messages for the line-delimited TCP protocol (one per line).
+# Send with:  corebank send --host 127.0.0.1 --port 7400 "<line>"
+# or pipe:    grep -v '^#' examples/messages.txt | nc 127.0.0.1 7400
+PING
+ACCOUNT_CREATE|id=EX-SETTLE|name=Settlement Account|ccy=GBP|type=SETTLEMENT
+ACCOUNT_CREATE|id=EX-CUST-A|name=Customer A|ccy=GBP
+ACCOUNT_CREATE|id=EX-CUST-B|name=Customer B|ccy=GBP
+CREDIT|key=EX-OPEN-1|account=EX-SETTLE|amount=10000.00|ccy=GBP|ref=opening float
+TRANSFER|key=EX-T1|from=EX-SETTLE|to=EX-CUST-A|amount=250.00|ccy=GBP|ref=salary
+TRANSFER|key=EX-T1|from=EX-SETTLE|to=EX-CUST-A|amount=250.00|ccy=GBP|ref=salary
+TRANSFER|key=EX-T2|from=EX-CUST-A|to=EX-CUST-B|amount=40.00|ccy=GBP|ref=rent share
+DEBIT|key=EX-D1|account=EX-CUST-B|amount=15.00|ccy=GBP|ref=cash withdrawal
+BALANCE|account=EX-CUST-A
+TXN_GET|txn=TXN-REPLACE-WITH-A-REAL-ID
