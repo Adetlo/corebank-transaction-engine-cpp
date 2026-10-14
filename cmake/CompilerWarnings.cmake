@@ -16,6 +16,9 @@ function(corebank_set_warnings target)
     -Wdouble-promotion
     -Wformat=2
     -Wimplicit-fallthrough
+    # Designated initialisers deliberately rely on default member initialisers for the
+    # fields they leave out (query and option structs); this warning would forbid that.
+    -Wno-missing-field-initializers
   )
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # -Wuseless-cast is omitted: casts between int64_t and long long are needed on

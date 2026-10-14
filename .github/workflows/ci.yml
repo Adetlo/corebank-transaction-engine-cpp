@@ -189,5 +189,6 @@ jobs:
           docker exec corebank-ci corebank send --host 127.0.0.1 --port 7400 "BALANCE|account=CI-A" | grep -q "balance=10.00"
           test "$(docker inspect -f '{{.Config.User}}' corebank-ci)" = "corebank:corebank"
           docker stop -t 30 corebank-ci
-          docker logs corebank-ci | grep -q '"event":"engine.stopped"'
+          docker logs corebank-ci > engine.log 2>&1
+          grep '"event":"engine.stopped"' engine.log
           docker rm corebank-ci

@@ -13,7 +13,7 @@ work="$(mktemp -d "${TMPDIR:-/tmp}/corebank-smoke.XXXXXX")"
 export COREBANK_DB="${work}/smoke.db" COREBANK_BATCH_DIR="${work}/batch" COREBANK_LOG_DIR="${work}/log"
 export COREBANK_PID_FILE="${work}/corebank.pid" COREBANK_PORT="${SMOKE_PORT:-7499}" COREBANK_LOG_LEVEL=WARN
 export COREBANK_VAR="${work}"
-# shellcheck disable=SC2329  # invoked through the EXIT trap
+# shellcheck disable=SC2317,SC2329  # invoked through the EXIT trap
 cleanup() {
   "${COREBANK_HOME}/scripts/stop.sh" >/dev/null 2>&1 || true
   rm -rf "${work}"

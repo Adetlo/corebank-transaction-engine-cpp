@@ -42,7 +42,7 @@ per_client="${DEMO_TRANSFERS_PER_CLIENT:-25}"
 # Unique suffix so that a remote demo can be re-run against the same database.
 run_id="$(date -u +%H%M%S)"
 
-# shellcheck disable=SC2329  # invoked through the EXIT trap
+# shellcheck disable=SC2317,SC2329  # invoked through the EXIT trap
 cleanup() {
   if [[ "${remote}" != true ]]; then
     "${COREBANK_HOME}/scripts/stop.sh" >/dev/null 2>&1 || true
