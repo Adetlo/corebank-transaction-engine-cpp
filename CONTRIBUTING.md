@@ -36,6 +36,11 @@ scripts/smoke_test.sh
 
 Pinned tool versions: clang-format and clang-tidy 18.1.x (CI installs them with pipx).
 
+The sanitizer gates are authoritative on Linux (the CI runners). On macOS with the Apple
+toolchain the AddressSanitizer and ThreadSanitizer runtimes may fail to start on recent
+OS releases; UndefinedBehaviorSanitizer works. Run the ASan and TSan builds on Linux or
+rely on the CI jobs.
+
 ## Test layout
 
 | Directory | What it proves |

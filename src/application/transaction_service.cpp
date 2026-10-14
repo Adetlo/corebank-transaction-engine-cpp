@@ -407,7 +407,7 @@ Result<void> TransactionService::record_rejection(UnitOfWork& uow, Transaction& 
   return uow.commit();
 }
 
-Result<void> TransactionService::apply_legs(UnitOfWork& uow, Transaction& txn,
+Result<void> TransactionService::apply_legs(UnitOfWork& uow, const Transaction& txn,
                                             const std::vector<Leg>& legs) {
   for (const auto& leg : legs) {
     auto found = uow.find_account(leg.account);

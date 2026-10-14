@@ -77,7 +77,7 @@ class TransactionService {
   [[nodiscard]] Result<TransactionReceipt> post(UnitOfWork& uow, Transaction& txn, const Plan& plan,
                                                 const IdempotencyKey& key,
                                                 const std::string& signature);
-  [[nodiscard]] Result<void> apply_legs(UnitOfWork& uow, Transaction& txn,
+  [[nodiscard]] Result<void> apply_legs(UnitOfWork& uow, const Transaction& txn,
                                         const std::vector<Leg>& legs);
   [[nodiscard]] Result<void> validate_amount(const Money& amount) const;
   [[nodiscard]] Result<void> record_rejection(UnitOfWork& uow, Transaction& txn,

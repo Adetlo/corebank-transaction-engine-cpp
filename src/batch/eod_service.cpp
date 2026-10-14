@@ -421,7 +421,7 @@ Result<std::string> EodService::stage_cutoff(UnitOfWork& uow, BatchRun& run) {
          std::to_string(txns.value().size()) + " transactions dated " + run.business_date.str();
 }
 
-Result<std::string> EodService::stage_validate_pending(UnitOfWork& uow, BatchRun& run) {
+Result<std::string> EodService::stage_validate_pending(UnitOfWork& uow, const BatchRun& run) {
   TransactionQuery query;
   query.pending_only = true;
   query.created_before =
@@ -560,7 +560,7 @@ Result<std::string> EodService::stage_daily_summary(UnitOfWork& uow, BatchRun& r
   return std::to_string(totals.value().size()) + " currency summaries written to " + path.string();
 }
 
-Result<std::string> EodService::stage_archive(UnitOfWork& uow, BatchRun& run) const {
+Result<std::string> EodService::stage_archive(UnitOfWork& uow, const BatchRun& run) const {
   TransactionQuery query;
   query.business_date = run.business_date;
   query.limit = 10'000'000;

@@ -53,11 +53,11 @@ class EodService {
 
   [[nodiscard]] Result<std::string> stage_precheck(UnitOfWork& uow, const BatchRun& run) const;
   [[nodiscard]] Result<std::string> stage_cutoff(UnitOfWork& uow, BatchRun& run);
-  [[nodiscard]] Result<std::string> stage_validate_pending(UnitOfWork& uow, BatchRun& run);
+  [[nodiscard]] Result<std::string> stage_validate_pending(UnitOfWork& uow, const BatchRun& run);
   [[nodiscard]] Result<std::string> stage_balance_check(UnitOfWork& uow, const BatchRun& run);
   [[nodiscard]] Result<std::string> stage_reconciliation(UnitOfWork& uow, BatchRun& run);
   [[nodiscard]] Result<std::string> stage_daily_summary(UnitOfWork& uow, BatchRun& run);
-  [[nodiscard]] Result<std::string> stage_archive(UnitOfWork& uow, BatchRun& run) const;
+  [[nodiscard]] Result<std::string> stage_archive(UnitOfWork& uow, const BatchRun& run) const;
 
   Repository& repository_;
   const Clock& clock_;

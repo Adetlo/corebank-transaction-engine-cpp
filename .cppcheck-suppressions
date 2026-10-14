@@ -14,3 +14,6 @@ useStlAlgorithm
 # CurrencyCode is a four-byte trivially copyable value type; older cppcheck releases
 # (2.13 on Ubuntu) flag passing it by value as a performance issue.
 passedByValue
+passedByValueCallback
+# RAII guards (lock guards, idempotency tokens) are held for their side effect, not read.
+unreadVariable
