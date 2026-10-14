@@ -1,0 +1,52 @@
+# EXAMPLE unit file for demonstration purposes only. Adjust paths, user and group
+# before use. It runs the engine as an unprivileged user, restarts it on failure,
+# reads configuration from the environment and stops it gracefully with SIGTERM.
+#
+# Install:  sudo cp systemd/corebank-engine.service /etc/systemd/system/
+#           sudo useradd --system --home /srv/corebank --shell /usr/sbin/nologin corebank
+#           sudo install -d -o corebank -g corebank -m 0750 /srv/corebank/var
+#           sudo systemctl daemon-reload && sudo systemctl enable --now corebank-engine
+# Logs:     journalctl -u corebank-engine -f   (JSON lines on stderr)
+
+[Unit]
+Description=CoreBank Transaction Engine (educational, synthetic data)
+Documentation=https://github.com/Adetlo/corebank-transaction-engine-cpp
+After=network.target
+
+[Service]
+Type=simple
+User=corebank
+Group=corebank
+WorkingDirectory=/srv/corebank
+# Environment overrides configuration file keys (see docs/OPERATIONS.md).
+Environment=COREBANK_CONFIG=/etc/corebank/default.yaml
+Environment=COREBANK_DB=/srv/corebank/var/corebank.db
+Environment=COREBANK_BATCH_DIR=/srv/corebank/var/batch
+Environment=COREBANK_LOG_LEVEL=INFO
+EnvironmentFile=-/etc/corebank/engine.env
+ExecStart=/usr/local/bin/corebank serve
+ExecStartPost=/bin/sh -c 'for i in $(seq 1 50); do /usr/local/bin/corebank health --host 127.0.0.1 --port 7400 && exit 0; sleep 0.2; done; exit 1'
+# Graceful shutdown: SIGTERM lets the engine stop accepting, drain its queue and audit the stop.
+KillSignal=SIGTERM
+KillMode=mixed
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=300
+StartLimitBurst=5
+UMask=0027
+
+# Hardening (the engine needs only its state directory and loopback networking).
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+ReadWritePaths=/srv/corebank/var
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

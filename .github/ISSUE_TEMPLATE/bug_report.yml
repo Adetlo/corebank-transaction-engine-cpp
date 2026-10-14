@@ -1,0 +1,32 @@
+name: Bug report
+description: Something behaves differently from what the documentation or tests promise.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you saw. Include the exact command and exit code.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: Commands or a test case using synthetic data only.
+      render: bash
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "OS, compiler and version, CMake version, SQLite version, commit SHA"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines
+      description: JSON log lines from the engine or script output. Remove anything you consider sensitive.
+      render: json

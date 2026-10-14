@@ -1,0 +1,193 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_GENERATOR: Ninja
+
+jobs:
+  build-test:
+    name: Build and test (${{ matrix.compiler }}, ${{ matrix.build_type }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+            build_type: Release
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+            build_type: Debug
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev sqlite3
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure -L '^unit$'
+      - name: Integration, batch, messaging, property, CLI tests
+        run: ctest --test-dir build --output-on-failure -L '^(integration|batch|messaging|property|cli)$'
+      - name: Concurrency tests
+        run: ctest --test-dir build --output-on-failure -L '^concurrency$'
+      - name: Shell smoke test
+        run: scripts/smoke_test.sh
+      - name: Benchmark (smoke run, local synthetic numbers only)
+        if: matrix.build_type == 'Release'
+        run: ./build/corebank-bench --transactions 500 --threads 2
+
+  format:
+    name: clang-format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install clang-format 18
+        run: pipx install clang-format==18.1.8
+      - name: Check formatting
+        run: |
+          find src include tests -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
+
+  clang-tidy:
+    name: clang-tidy
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev
+          pipx install clang-tidy==18.1.8
+      - name: Configure (compile_commands.json)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCOREBANK_BUILD_TESTS=OFF
+      - name: Run clang-tidy (warnings are errors, see .clang-tidy)
+        run: |
+          find src -name '*.cpp' | xargs -P "$(nproc)" -I{} clang-tidy -p build --quiet {}
+
+  cppcheck:
+    name: cppcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cppcheck
+          cppcheck --version
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=warning,style,performance,portability --std=c++20 --language=c++ \
+            --inline-suppr --suppressions-list=.cppcheck-suppressions --error-exitcode=1 \
+            --quiet -I include src include
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends shellcheck
+          shellcheck --version
+      - name: Lint scripts
+        run: shellcheck -x -S style scripts/*.sh scripts/lib/common.sh
+
+  sanitizers:
+    name: ASan + UBSan
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+      ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1:detect_stack_use_after_return=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev sqlite3
+      - name: Configure with AddressSanitizer and UndefinedBehaviorSanitizer
+        run: cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug -DCOREBANK_ENABLE_ASAN=ON -DCOREBANK_ENABLE_UBSAN=ON
+      - name: Build
+        run: cmake --build build-asan --parallel
+      - name: Test (no sanitizer findings allowed)
+        run: ctest --test-dir build-asan --output-on-failure -j 2
+
+  # ThreadSanitizer runs with clang: GCC's TSan runtime has failed to map its shadow
+  # memory on recent Linux kernels with larger ASLR ranges, while clang 18 handles it.
+  # It covers every suite that spawns threads or sockets plus the unit tests.
+  thread-sanitizer:
+    name: ThreadSanitizer (unit, integration, concurrency, messaging, property)
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      CXX: clang++
+      TSAN_OPTIONS: halt_on_error=1:second_deadlock_stack=1
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libsqlite3-dev
+      - name: Configure with ThreadSanitizer
+        run: cmake -S . -B build-tsan -DCMAKE_BUILD_TYPE=Debug -DCOREBANK_ENABLE_TSAN=ON
+      - name: Build
+        run: cmake --build build-tsan --parallel
+      - name: Test concurrency-sensitive suites under TSan
+        run: ctest --test-dir build-tsan --output-on-failure -L '^(unit|concurrency|messaging|property|integration)$'
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          load: true
+          tags: corebank-transaction-engine:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test the image
+        run: |
+          set -euo pipefail
+          docker run -d --name corebank-ci -p 127.0.0.1:7400:7400 corebank-transaction-engine:ci
+          for i in $(seq 1 30); do
+            if docker exec corebank-ci corebank health --host 127.0.0.1 --port 7400; then break; fi
+            sleep 1
+          done
+          docker exec corebank-ci corebank health --host 127.0.0.1 --port 7400
+          docker exec corebank-ci corebank account create --id CI-A --name "CI A" --currency GBP
+          docker exec corebank-ci corebank send --host 127.0.0.1 --port 7400 "CREDIT|key=CI-1|account=CI-A|amount=10.00|ccy=GBP"
+          docker exec corebank-ci corebank send --host 127.0.0.1 --port 7400 "BALANCE|account=CI-A" | grep -q "balance=10.00"
+          test "$(docker inspect -f '{{.Config.User}}' corebank-ci)" = "corebank:corebank"
+          docker stop -t 30 corebank-ci
+          docker logs corebank-ci | grep -q '"event":"engine.stopped"'
+          docker rm corebank-ci
