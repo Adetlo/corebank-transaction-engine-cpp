@@ -132,16 +132,17 @@ void TcpServer::stop() {
     const std::lock_guard lock(connections_mutex_);
     connections.swap(connections_);
   }
+  // The fd stays open until its thread has been joined, so shutdown() always targets
+  // the live socket and no thread ever races on the descriptor value.
   for (const auto& connection : connections) {
     connection->thread.request_stop();
-    if (connection->fd >= 0) {
-      ::shutdown(connection->fd, SHUT_RDWR);
-    }
+    ::shutdown(connection->fd, SHUT_RDWR);
   }
   for (const auto& connection : connections) {
     if (connection->thread.joinable()) {
       connection->thread.join();
     }
+    ::close(connection->fd);
   }
   Logger::instance().info("tcp.stopped", {{"total_connections", total_.load()}});
 }
@@ -164,6 +165,7 @@ void TcpServer::reap_finished() {
       if ((*it)->thread.joinable()) {
         (*it)->thread.join();
       }
+      ::close((*it)->fd);
       it = connections_.erase(it);
     } else {
       ++it;
@@ -265,8 +267,7 @@ void TcpServer::serve_connection(Connection& connection, const std::stop_token& 
       break;
     }
   }
-  ::close(fd);
-  connection.fd = -1;
+  // Do not close here: the owner (acceptor reap or stop()) closes after joining.
   connection.done.store(true);
 }
 

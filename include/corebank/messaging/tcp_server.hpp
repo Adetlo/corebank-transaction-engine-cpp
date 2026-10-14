@@ -46,8 +46,8 @@ class TcpServer {
 
  private:
   struct Connection {
-    int fd{-1};
-    std::atomic<bool> done{false};
+    int fd{-1};                     // written before the thread starts, closed after join
+    std::atomic<bool> done{false};  // set by the connection thread when its loop ends
     std::jthread thread;
   };
 

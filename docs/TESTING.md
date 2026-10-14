@@ -129,6 +129,7 @@ obtain `compile_commands.json`, and runs on every file under `src/` with
 | `bugprone-easily-swappable-parameters` | Domain functions legitimately take several adjacent identifiers or amounts; strong types (`AccountId`, `TransactionId`, `Money`) already prevent the mix-ups the check targets |
 | `bugprone-exception-escape` | Domain code uses `Result<T>`, not exceptions (ADR-0007); the check reports standard-library allocation paths only |
 | `performance-enum-size` | Scoped enums are intentionally `int`-sized; the storage saving is irrelevant and the narrower type would spread casts |
+| `clang-analyzer-core.uninitialized.Assign` | With libstdc++ the static analyzer cannot model `std::variant` storage and reports the `Error` copied out of a `Result<T>` (for example `return row.error();`) as uninitialised; the value is always set by the converting constructor |
 | `performance-avoid-endl` | Readability preference in CLI output |
 | `misc-include-cleaner` | Transitive includes through the project's own headers are intentional; enforcing direct includes everywhere adds noise without a safety gain |
 | `misc-non-private-member-variables-in-classes` | Aggregates such as `Transaction`, `BatchRun` and `Config` are plain structs by design |

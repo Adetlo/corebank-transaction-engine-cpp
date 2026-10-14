@@ -8,6 +8,7 @@ Checks: >
   -bugprone-exception-escape,
   -bugprone-unchecked-optional-access,
   clang-analyzer-*,
+  -clang-analyzer-core.uninitialized.Assign,
   concurrency-*,
   cppcoreguidelines-init-variables,
   cppcoreguidelines-no-malloc,
