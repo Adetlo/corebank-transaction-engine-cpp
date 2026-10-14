@@ -12,7 +12,6 @@ function(corebank_set_warnings target)
     -Wcast-align
     -Wunused
     -Woverloaded-virtual
-    -Wnull-dereference
     -Wdouble-promotion
     -Wformat=2
     -Wimplicit-fallthrough
@@ -20,6 +19,11 @@ function(corebank_set_warnings target)
     # fields they leave out (query and option structs); this warning would forbid that.
     -Wno-missing-field-initializers
   )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # GCC's -Wnull-dereference reports false positives inside libstdc++ at -O3
+    # (e.g. stl_construct.h from std::vector::insert), so it is enabled for Clang only.
+    list(APPEND _warnings -Wnull-dereference)
+  endif()
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # -Wuseless-cast is omitted: casts between int64_t and long long are needed on
     # platforms where the typedefs differ (macOS) and would be flagged on Linux.
