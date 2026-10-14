@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(corebank_transaction_engine
-  VERSION 0.1.0
+  VERSION 1.0.0
   DESCRIPTION "Production-style educational C++ core-banking transaction engine"
   LANGUAGES CXX)
 
