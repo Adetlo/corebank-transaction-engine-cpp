@@ -15,6 +15,12 @@ just the happy path.
 > and generic banking concepts. It is not derived from or representative of any employer
 > production system.
 
+> **Development history note.** This project was developed progressively beginning in late 2025 and
+> was later consolidated for public release. Because complete original Git metadata was not retained,
+> portions of the repository history were reconstructed around known implementation phases.
+> Historical dates should be understood as approximate development milestones.
+> See [docs/HISTORY_RECONSTRUCTION.md](docs/HISTORY_RECONSTRUCTION.md).
+
 [![CI](https://github.com/Adetlo/corebank-transaction-engine-cpp/actions/workflows/ci.yml/badge.svg)](https://github.com/Adetlo/corebank-transaction-engine-cpp/actions/workflows/ci.yml)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C)
 ![Linux](https://img.shields.io/badge/platform-Linux-FCC624)
